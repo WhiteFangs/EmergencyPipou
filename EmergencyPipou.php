@@ -27,6 +27,9 @@ $randfollower = $followers[array_rand($followers)];
 $screenName = $randfollower->screen_name;
 
 $tweet = "@" . $screenName . " " . $phrases[array_rand($phrases)];
+while(strlen($tweet) > 140){
+  $tweet = "@" . $screenName . " " . $phrases[array_rand($phrases)];
+}
 
 // Post the tweet
 $postfields = array(
@@ -34,8 +37,8 @@ $postfields = array(
 $url = "https://api.twitter.com/1.1/statuses/update.json";
 $requestMethod = "POST";
 
-$twitter = new TwitterAPIExchange($APIsettings);
-echo $twitter->buildOauth($url, $requestMethod)
+echo $twitter->resetFields()
+              ->buildOauth($url, $requestMethod)
               ->setPostfields($postfields)
               ->performRequest();
 
