@@ -2,7 +2,7 @@
 
 A simple Twitter bot made in PHP that tweets cute things to its followers
 
-It is a copy of [@petosaurus](https://github.com/petosorus)'s Twitter bot project [EmergencyPipou](https://github.com/petosorus/emergencyPipou) but in PHP instead of Python.
+It is a copy of [@petosorus](https://github.com/petosorus)'s Twitter bot project [EmergencyPipou](https://github.com/petosorus/emergencyPipou) but in PHP instead of Python.
 [@EmergencyPipou](https://twitter.com/EmergencyPipou) chooses a random follower and tweets to him/her a random cute sentence from the ones stored in <code>Phrases.php</code>.
 
 ## Contribute
