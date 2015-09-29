@@ -1,18 +1,13 @@
-# TwitterLyricsBot
-A simple Twitter bot made in PHP that tweets random lyrics from a chosen artist
+# EmergencyPipou
 
-## Install
+A simple Twitter bot made in PHP that tweets cute things to its followers
 
-- Clone the repository
-- [Create a Twitter app](https://apps.twitter.com/) with your bot's account
-- Set access tokens in the `LyricsBot.php` file
-- Go to [Lyrics Wikia](http://lyrics.wikia.com/) and find the desired artist's page, copy the URL
-- Set `$artistWikiaLink` variable in `LyricsBot.php` to the artist's lyrics wikia page URL you found
-- Create a CRON Job that runs `LyricsBot.php` whenever you want your bot to tweet
+It is a copy of [@petosaurus](https://github.com/petosorus)'s Twitter bot project [EmergencyPipou](https://github.com/petosorus/emergencyPipou) but in PHP instead of Python.
+[@EmergencyPipou](https://twitter.com/EmergencyPipou) chooses a random follower and tweets to him/her a random cute sentence from the ones stored in <code>Phrases.php</code>.
 
-## Example
+## Contribute
 
-[@MancOrchSays](https://twitter.com/MancOrchSays) is a Twitter bot that tweets random lyrics from Manchester Orchestra.
+You can make Pull Requests to edit the <code>Phrases.php</code> and add more sentences or just tweet to [@EmergencyPipou](https://twitter.com/EmergencyPipou) or me [@White_Fangs](https://twitter.com/White_Fangs) a sentence you would like to add.
 
 ## License
 The source code of this bot is available under the terms of the [MIT license](http://www.opensource.org/licenses/mit-license.php).
