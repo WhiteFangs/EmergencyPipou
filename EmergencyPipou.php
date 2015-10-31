@@ -12,6 +12,12 @@ $APIsettings = array(
     'consumer_secret' => "YOUR_CONSUMER_KEY_SECRET"
 );
 
+// The script is called every 5 min, so 288 times a day, it should tweet randomly a few times per day depending on the number of followers
+// The more followers, the more random tweets
+function formula($nbfollowers){
+    return ($nbfollowers > 1) ? ($nbfollowers*2 / (log(288, 2) * log($nbfollowers, 2)))/144 : 0.5/144;
+}
+
 $url = 'https://api.twitter.com/1.1/followers/list.json';
 $getfield = '?screen_name=EmergencyPipou';
 $requestMethod = 'GET';
@@ -23,23 +29,26 @@ $followers = $twitter->setGetfield($getfield)
 
 $followers = json_decode($followers);
 $followers = $followers->users;
-$randfollower = $followers[array_rand($followers)];
-$screenName = $randfollower->screen_name;
 
-$tweet = "@" . $screenName . " " . $phrases[array_rand($phrases)];
-while(strlen($tweet) > 140){
-  $tweet = "@" . $screenName . " " . $phrases[array_rand($phrases)];
+// Test if should tweet or not
+$p = formula(count($followers));
+if(mt_rand() / mt_getrandmax() < $p){
+  $randfollower = $followers[array_rand($followers)];
+  $screenName = $randfollower->screen_name;
+
+  do{
+    $tweet = "@" . $screenName . " " . $phrases[array_rand($phrases)];
+  }while(strlen($tweet) > 140)
+
+  // Post the tweet
+  $postfields = array(
+      'status' =>  $tweet);
+  $url = "https://api.twitter.com/1.1/statuses/update.json";
+  $requestMethod = "POST";
+
+  echo $twitter->resetFields()
+                ->buildOauth($url, $requestMethod)
+                ->setPostfields($postfields)
+                ->performRequest();
 }
-
-// Post the tweet
-$postfields = array(
-    'status' =>  $tweet);
-$url = "https://api.twitter.com/1.1/statuses/update.json";
-$requestMethod = "POST";
-
-echo $twitter->resetFields()
-              ->buildOauth($url, $requestMethod)
-              ->setPostfields($postfields)
-              ->performRequest();
-
  ?>
