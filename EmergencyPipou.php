@@ -14,13 +14,59 @@ $APIsettings = array(
 );
 $twitter = new TwitterAPIExchange($APIsettings);
 
+// FOLLOW BACK FOLLOWERS
+
+// Get followers
+$url = 'https://api.twitter.com/1.1/followers/ids.json';
+$getfield = '?screen_name=EmergencyPipou';
+$requestMethod = 'GET';
+$followers = $twitter->setGetfield($getfield)
+    ->buildOauth($url, $requestMethod)
+    ->performRequest();
+echo $followers;
+$followers = json_decode($followers);
+
+$followerIds = array();
+foreach ($followers->ids as $i => $id) {
+    $followerIds[] = $id;
+}
+
+// Get friends
+$url = 'https://api.twitter.com/1.1/friends/ids.json';
+$getfield = '?screen_name=EmergencyPipou';
+$requestMethod = 'GET';
+$friends = $twitter->resetFields()
+    ->setGetfield($getfield)
+    ->buildOauth($url, $requestMethod)
+    ->performRequest();
+echo $friends;
+$friends = json_decode($friends);
+
+$friendIds = array();
+foreach ($friends->ids as $i => $id) {
+    $friendIds[] = $id;
+}
+
+// Follow followers that are not friends
+$url = "https://api.twitter.com/1.1/friendships/create.json";
+$requestMethod = "POST";
+foreach($followerIds as $id){
+  if(!in_array($id,$friendIds) ){
+    $postfields = array('user_id' =>  $id);
+    echo $twitter->resetFields()
+                  ->buildOauth($url, $requestMethod)
+                  ->setPostfields($postfields)
+                  ->performRequest();
+  }
+}
+
 // REPLY TO MENTIONS
 
 $url = 'https://api.twitter.com/1.1/statuses/mentions_timeline.json';
 $getfield = '?contributor_details=true';
 $requestMethod = 'GET';
-
-$mentions = $twitter->setGetfield($getfield)
+$mentions = $twitter->resetFields()
+    ->setGetfield($getfield)
     ->buildOauth($url, $requestMethod)
     ->performRequest();
 
@@ -28,7 +74,7 @@ $mentions = json_decode($mentions);
 foreach ($mentions as $mention) {
   $date = $mention->created_at;
   $date = strtotime($date);
-  if($date > $time - 5 * 60){
+  if($date > $time - 5 * 60){ // check the mentions from last 5 minutes
     // Reply to user
     $tweetTo = "@" . $mention->user->screen_name;
     // Add other mentionned users
@@ -47,7 +93,6 @@ foreach ($mentions as $mention) {
       'status' =>  $tweet);
     $url = "https://api.twitter.com/1.1/statuses/update.json";
     $requestMethod = "POST";
-
     echo $twitter->resetFields()
                   ->buildOauth($url, $requestMethod)
                   ->setPostfields($postfields)
@@ -66,7 +111,6 @@ function formula($nbfollowers){
 $url = 'https://api.twitter.com/1.1/followers/list.json';
 $getfield = '?screen_name=EmergencyPipou';
 $requestMethod = 'GET';
-
 $followers = $twitter->resetFields()
     ->setGetfield($getfield)
     ->buildOauth($url, $requestMethod)
@@ -90,7 +134,6 @@ if(mt_rand() / mt_getrandmax() < $p){
       'status' =>  $tweet);
   $url = "https://api.twitter.com/1.1/statuses/update.json";
   $requestMethod = "POST";
-
   echo $twitter->resetFields()
                 ->buildOauth($url, $requestMethod)
                 ->setPostfields($postfields)
