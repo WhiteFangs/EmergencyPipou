@@ -90,7 +90,8 @@ foreach ($mentions as $mention) {
     }while(strlen($tweet) > 140);
     // Post the tweet
     $postfields = array(
-      'status' =>  $tweet);
+      'status' =>  $tweet,
+      'in_reply_to_status_id' => $mention->id_str);
     $url = "https://api.twitter.com/1.1/statuses/update.json";
     $requestMethod = "POST";
     echo $twitter->resetFields()
