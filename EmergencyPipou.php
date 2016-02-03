@@ -4,6 +4,7 @@ $time = time();
 include("./Phrases.php");
 require_once('./TwitterAPIExchange.php');
 header('Content-Type: text/html; charset=utf-8');
+$calledEvery = 10; // minutes
 
 /** Set access tokens here - see: https://apps.twitter.com/ **/
 $APIsettings = array(
@@ -23,7 +24,6 @@ $requestMethod = 'GET';
 $followers = $twitter->setGetfield($getfield)
     ->buildOauth($url, $requestMethod)
     ->performRequest();
-echo $followers;
 $followers = json_decode($followers);
 
 $followerIds = array();
@@ -39,7 +39,6 @@ $friends = $twitter->resetFields()
     ->setGetfield($getfield)
     ->buildOauth($url, $requestMethod)
     ->performRequest();
-echo $friends;
 $friends = json_decode($friends);
 
 $friendIds = array();
@@ -53,7 +52,7 @@ $requestMethod = "POST";
 foreach($followerIds as $id){
   if(!in_array($id,$friendIds) ){
     $postfields = array('user_id' =>  $id);
-    echo $twitter->resetFields()
+    $twitter->resetFields()
                   ->buildOauth($url, $requestMethod)
                   ->setPostfields($postfields)
                   ->performRequest();
@@ -74,7 +73,7 @@ $mentions = json_decode($mentions);
 foreach ($mentions as $mention) {
   $date = $mention->created_at;
   $date = strtotime($date);
-  if($date > $time - 5 * 60){ // check the mentions from last 5 minutes
+  if($date > $time - $calledEvery * 60){ // check the mentions from last 5 minutes
     // Reply to user
     $tweetTo = "@" . $mention->user->screen_name;
     // Add other mentionned users
@@ -94,7 +93,7 @@ foreach ($mentions as $mention) {
       'in_reply_to_status_id' => $mention->id_str);
     $url = "https://api.twitter.com/1.1/statuses/update.json";
     $requestMethod = "POST";
-    echo $twitter->resetFields()
+    $twitter->resetFields()
                   ->buildOauth($url, $requestMethod)
                   ->setPostfields($postfields)
                   ->performRequest();
@@ -103,10 +102,11 @@ foreach ($mentions as $mention) {
 
 // THEN SURPRISE RANDOM TWEET
 
-// The script is called every 5 min, so 288 times a day, it should tweet randomly a few times per day depending on the number of followers
+// The script should tweet randomly a few times per day depending on the number of followers
 // The more followers, the more random tweets
 function formula($nbfollowers){
-    return ($nbfollowers > 1) ? ($nbfollowers*2 / (log(288, 2) * log($nbfollowers, 2)))/144 : 0.5/144;
+    $timesPerDay = 24 * (60 / $calledEvery);
+    return ($nbfollowers > 1) ? ($nbfollowers*2 / (log($timesPerDay, 2) * log($nbfollowers, 2)))/($timesPerDay / 2) : 0.5/($timesPerDay / 2);
 }
 
 $url = 'https://api.twitter.com/1.1/followers/list.json';
@@ -135,7 +135,7 @@ if(mt_rand() / mt_getrandmax() < $p){
       'status' =>  $tweet);
   $url = "https://api.twitter.com/1.1/statuses/update.json";
   $requestMethod = "POST";
-  echo $twitter->resetFields()
+  $twitter->resetFields()
                 ->buildOauth($url, $requestMethod)
                 ->setPostfields($postfields)
                 ->performRequest();
