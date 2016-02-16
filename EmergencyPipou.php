@@ -104,7 +104,7 @@ foreach ($mentions as $mention) {
 
 // The script should tweet randomly a few times per day depending on the number of followers
 // The more followers, the more random tweets
-function formula($nbfollowers){
+function formula($nbfollowers, $calledEvery){
     $timesPerDay = 24 * (60 / $calledEvery);
     return ($nbfollowers > 1) ? ($nbfollowers*2 / (log($timesPerDay, 2) * log($nbfollowers, 2)))/($timesPerDay / 2) : 0.5/($timesPerDay / 2);
 }
@@ -121,7 +121,7 @@ $followers = json_decode($followers);
 $followers = $followers->users;
 
 // Test if should tweet or not
-$p = formula(count($followers));
+$p = formula(count($followers), $calledEvery);
 if(mt_rand() / mt_getrandmax() < $p){
   $randfollower = $followers[array_rand($followers)];
   $screenName = $randfollower->screen_name;
