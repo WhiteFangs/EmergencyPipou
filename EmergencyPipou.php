@@ -17,7 +17,7 @@ $twitter = new TwitterAPIExchange($APIsettings);
 
 // FOLLOW BACK FOLLOWERS
 
-// Get followers
+// Get followers ids
 $url = 'https://api.twitter.com/1.1/followers/ids.json';
 $getfield = '?screen_name=EmergencyPipou';
 $requestMethod = 'GET';
@@ -30,6 +30,18 @@ $followerIds = array();
 foreach ($followers->ids as $i => $id) {
     $followerIds[] = $id;
 }
+
+// Get followers list
+$url = 'https://api.twitter.com/1.1/followers/list.json';
+$getfield = '?screen_name=EmergencyPipou';
+$requestMethod = 'GET';
+$followersList = $twitter->resetFields()
+    ->setGetfield($getfield)
+    ->buildOauth($url, $requestMethod)
+    ->performRequest();
+
+$followersList = json_decode($followersList);
+$followersList = $followersList->users;
 
 // Get friends
 $url = 'https://api.twitter.com/1.1/friends/ids.json';
@@ -56,6 +68,26 @@ foreach($followerIds as $id){
                   ->buildOauth($url, $requestMethod)
                   ->setPostfields($postfields)
                   ->performRequest();
+    $followerToWelcome = null;
+    foreach($followersList as $follower) {
+        if ($id == $follower->id) {
+            $followerToWelcome = $follower->screen_name;
+            break;
+        }
+    }
+    if($followerToWelcome != null){
+      $welcomeTweet = "@" . $followerToWelcome . " Coucou ! Merci de me suivre, je t'enverrai des câlins aléatoirement mais si tu en as besoin immédiatement, mentionne-moi ! ♥";
+      // Post welcoming tweet
+      $postfields = array(
+          'status' =>  $welcomeTweet);
+      $url = "https://api.twitter.com/1.1/statuses/update.json";
+      $requestMethod = "POST";
+      echo '<br>Welcome tweet: <br>';
+      echo $twitter->resetFields()
+                    ->buildOauth($url, $requestMethod)
+                    ->setPostfields($postfields)
+                    ->performRequest();
+    }
   }
 }
 
@@ -109,21 +141,10 @@ function formula($nbfollowers, $calledEvery){
     return ($nbfollowers > 1) ? ($nbfollowers*2 / (log($timesPerDay, 2) * log($nbfollowers, 2)))/($timesPerDay / 2) : 0.5/($timesPerDay / 2);
 }
 
-$url = 'https://api.twitter.com/1.1/followers/list.json';
-$getfield = '?screen_name=EmergencyPipou';
-$requestMethod = 'GET';
-$followers = $twitter->resetFields()
-    ->setGetfield($getfield)
-    ->buildOauth($url, $requestMethod)
-    ->performRequest();
-
-$followers = json_decode($followers);
-$followers = $followers->users;
-
 // Test if should tweet or not
-$p = formula(count($followers), $calledEvery);
+$p = formula(count($followersList), $calledEvery);
 if(mt_rand() / mt_getrandmax() < $p){
-  $randfollower = $followers[array_rand($followers)];
+  $randfollower = $followersList[array_rand($followersList)];
   $screenName = $randfollower->screen_name;
 
   do{
