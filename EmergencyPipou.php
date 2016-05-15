@@ -1,6 +1,7 @@
 <?php
 
 $time = time();
+include("./twitterCredentials.php");
 include("./Phrases.php");
 require_once('./TwitterAPIExchange.php');
 header('Content-Type: text/html; charset=utf-8');
@@ -8,10 +9,10 @@ $calledEvery = 10; // minutes
 
 /** Set access tokens here - see: https://apps.twitter.com/ **/
 $APIsettings = array(
-    'oauth_access_token' => "YOUR_ACCESS_TOKEN",
-    'oauth_access_token_secret' => "YOUR_ACCESS_TOKEN_SECRET",
-    'consumer_key' => "YOUR_CONSUMER_KEY",
-    'consumer_secret' => "YOUR_CONSUMER_KEY_SECRET"
+    'oauth_access_token' => $oauthToken,
+    'oauth_access_token_secret' => $oauthTokenSecret,
+    'consumer_key' => $consumerKey,
+    'consumer_secret' => $consumerSecret
 );
 $twitter = new TwitterAPIExchange($APIsettings);
 
