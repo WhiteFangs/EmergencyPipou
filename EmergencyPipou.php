@@ -77,7 +77,7 @@ foreach($followerIds as $id){
         }
     }
     if($followerToWelcome != null){
-      $welcomeTweet = "@" . $followerToWelcome . " Coucou ! Merci de me suivre, je t'enverrai des câlins aléatoirement mais si tu en as besoin immédiatement, mentionne-moi ! ♥";
+      $welcomeTweet = "@" . $followerToWelcome . " Coucou ! Merci de me suivre, je t'enverrai des câlins aléatoirement mais si t'en as besoin immédiatement, mentionne-moi ! ♥";
       // Post welcoming tweet
       $postfields = array(
           'status' =>  $welcomeTweet);
