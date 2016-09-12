@@ -60,13 +60,11 @@ foreach ($friends->ids as $i => $id) {
 }
 
 // Follow followers that are not friends
-$url = "https://api.twitter.com/1.1/friendships/create.json";
-$requestMethod = "POST";
 foreach($followerIds as $id){
   if(!in_array($id,$friendIds) ){
     $postfields = array('user_id' =>  $id);
     $twitter->resetFields()
-                  ->buildOauth($url, $requestMethod)
+                  ->buildOauth("https://api.twitter.com/1.1/friendships/create.json", "POST")
                   ->setPostfields($postfields)
                   ->performRequest();
     $followerToWelcome = null;
@@ -81,11 +79,8 @@ foreach($followerIds as $id){
       // Post welcoming tweet
       $postfields = array(
           'status' =>  $welcomeTweet);
-      $url = "https://api.twitter.com/1.1/statuses/update.json";
-      $requestMethod = "POST";
-      echo '<br>Welcome tweet: <br>';
       echo $twitter->resetFields()
-                    ->buildOauth($url, $requestMethod)
+                    ->buildOauth("https://api.twitter.com/1.1/statuses/update.json", "POST")
                     ->setPostfields($postfields)
                     ->performRequest();
     }
