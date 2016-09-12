@@ -87,6 +87,17 @@ foreach($followerIds as $id){
   }
 }
 
+// Unfollow friends that are not followers
+foreach($friendIds as $id){
+  if(!in_array($id, $followerIds)){
+    $postfields = array('user_id' =>  $id);
+    $twitter->resetFields()
+                  ->buildOauth("https://api.twitter.com/1.1/friendships/destroy.json", "POST")
+                  ->setPostfields($postfields)
+                  ->performRequest();
+	}
+}
+
 // REPLY TO MENTIONS
 
 $url = 'https://api.twitter.com/1.1/statuses/mentions_timeline.json';
