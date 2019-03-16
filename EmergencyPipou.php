@@ -20,7 +20,7 @@ $twitter = new TwitterAPIExchange($APIsettings);
 
 // Get followers ids
 $url = 'https://api.twitter.com/1.1/followers/ids.json';
-$getfield = '?screen_name=EmergencyPipou';
+$getfield = '?screen_name=EmergencyPipou&count=5000';
 $requestMethod = 'GET';
 $followers = $twitter->setGetfield($getfield)
     ->buildOauth($url, $requestMethod)
@@ -33,16 +33,22 @@ foreach ($followers->ids as $i => $id) {
 }
 
 // Get followers list
-$url = 'https://api.twitter.com/1.1/followers/list.json';
-$getfield = '?screen_name=EmergencyPipou';
-$requestMethod = 'GET';
-$followersList = $twitter->resetFields()
-    ->setGetfield($getfield)
-    ->buildOauth($url, $requestMethod)
-    ->performRequest();
+$cursor = "-1";
+$followersList = array();
+do {
+  $url = 'https://api.twitter.com/1.1/followers/list.json';
+  $getfield = '?screen_name=EmergencyPipou&count=200&cursor=' . $cursor;
+  $requestMethod = 'GET';
+  $decodedResponse = $twitter->resetFields()
+      ->setGetfield($getfield)
+      ->buildOauth($url, $requestMethod)
+      ->performRequest();
 
-$followersList = json_decode($followersList);
-$followersList = $followersList->users;
+  $decodedResponse = json_decode($decodedResponse);
+  $followersList = array_merge($followersList, $decodedResponse->users);
+  $cursor = $decodedResponse->next_cursor_str;
+}
+while($cursor != "0");
 
 // Get friends
 $url = 'https://api.twitter.com/1.1/friends/ids.json';
